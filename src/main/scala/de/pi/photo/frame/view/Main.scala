@@ -6,6 +6,7 @@ import scalafx.scene.Scene
 import scalafx.scene.paint.Color._
 import scalafxml.core.DependenciesByType
 import scalafxml.core.FXMLView
+import scalafx.application.Platform
 
 
 /**
@@ -22,7 +23,8 @@ object Main extends JFXApp {
             new DependenciesByType(Map()))
     )
     
-    centerOnScreen
+    maximized = true    
+		fullScreen = true // doesn't work somehow    
   }
 	
 }

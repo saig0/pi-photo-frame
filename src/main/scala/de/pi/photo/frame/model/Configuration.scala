@@ -14,7 +14,7 @@ object Configuration {
   
 	// TODO make directory configurable
 	val directory = Paths.get("photos")
-	
+
 	// TODO support more images type
 	val fileFilter: FilenameFilter = new FilenameFilter {
 		def accept(file: File, name: String) = name.toLowerCase().endsWith(".jpg")
