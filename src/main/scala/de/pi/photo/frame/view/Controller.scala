@@ -21,10 +21,9 @@ import scalafx.stage.DirectoryChooser
 import scalafx.scene.input.MouseEvent
 import scalafx.stage.WindowEvent
 import scalafx.application.Platform
+import de.pi.photo.frame.model.Configuration
+import java.io.File
 
-/**
- * @author Philipp
- */
 @sfxml
 class Controller(
 	private val imageView1: ImageView,
@@ -32,6 +31,8 @@ class Controller(
 	private val noImagesFoundLabel: Label,
 	private val menu: VBox) {
 
+	var config: Configuration = _
+	
 	var images: List[String] = List()
 	var currentImage = 0
 	
@@ -77,13 +78,20 @@ class Controller(
 		val dirChooser = new DirectoryChooser()
 		dirChooser.title = "Select photo directory"
 		
-		dirChooser.initialDirectory = Configuration.directory.toFile
+		val dir = new File(config.directory)
+		
+		if (dir.exists)
+		{
+			dirChooser.initialDirectory = dir			
+		}		
 
 		val selectedDir = dirChooser.showDialog(Main.stage)		
 		
 		if (selectedDir != null)
 		{
-			Configuration.directory = selectedDir.toPath			
+			config.directory = selectedDir.getAbsolutePath	
+			config.save
+			
 			loadImages
 		}
 				
@@ -91,7 +99,7 @@ class Controller(
 	}
 	
 	def loadImages() {
-		Configuration.loadImages match {
+		config.loadImages match {
 			case Nil => {
 				noImagesFoundLabel.visible = true
 				imageView1.visible = false
@@ -116,6 +124,8 @@ class Controller(
 	
 	Platform.runLater({
 	
+		config = Configuration.load
+		
 		loadImages()
 		
 		val imageSwitchTimer = new Timer()
