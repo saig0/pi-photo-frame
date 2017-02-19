@@ -1,5 +1,6 @@
 package de.pi.photo.frame.model
 
+import scala.collection.JavaConversions._
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.io.File
@@ -9,25 +10,41 @@ import java.net.URL
 import java.io.FileOutputStream
 import java.io.FileInputStream
 import java.nio.charset.StandardCharsets
-
+import scala.util.Random
+import java.nio.file.FileVisitOption
+import java.util.stream.Collectors
 
 /**
  * @author Philipp
  */
 class Configuration(var directory: String) {
-  
-	// TODO support more images type
-	val fileFilter: FilenameFilter = new FilenameFilter {
-		def accept(file: File, name: String) = name.toLowerCase().endsWith(".jpg")
+  	
+	implicit def toJavaPredicate[A](f: Function1[A, Boolean]) = new java.util.function.Predicate[A] {
+			override def test(a: A): Boolean = f(a)
 	}
 	
+	implicit def toJavaFunction[A, B](f: Function1[A, B]) = new java.util.function.Function[A, B] {
+	  override def apply(a: A): B = f(a)
+	}
+	
+	def imageFilter = (path: Path) => {
+ 		val p = path.toString.toLowerCase
+ 		
+		p.endsWith(".jpg")
+	}
+
 	def loadImages: List[String] = {
 		
 		val dir = if (!directory.isEmpty) new File(directory) else Configuration.defaultPhotoDir 
 		
 		if (dir.exists){
-			// TODO look recursivly
-			dir.listFiles( fileFilter ).map(_.toURL().toExternalForm()).toList
+			val images = Files.walk(dir.toPath)
+				.filter(imageFilter)
+				.map[String]((p:Path) => p.toUri.toURL.toExternalForm)
+				.collect(Collectors.toList())
+				.toList
+			
+			Random.shuffle(images)
 		} else {
 			List()
 		}
