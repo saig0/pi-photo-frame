@@ -19,6 +19,8 @@ import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.stage.DirectoryChooser
 import scalafx.scene.input.MouseEvent
+import scalafx.stage.WindowEvent
+import scalafx.application.Platform
 
 /**
  * @author Philipp
@@ -62,34 +64,6 @@ class Controller(
     )
 	}
 	
-	Configuration.getImagePaths match {
-		case Nil => noImagesFoundLabel.visible = true
-		case urls => {
-			images = urls 
-			
-			// TODO terminate thread on exit
-			new Timer().schedule(new TimerTask 
-			{
-				def run = {
-					
-					if (currentImage % 2 == 0)
-					{
-						imageView1.image = getNextImage
-					}
-					else
-					{
-						imageView2.image = getNextImage
-					}
-				}							
-			}, 5000, 10000)
-		
-			// load first image
-			imageView1.image = getNextImage
-		
-			timeline.play
-		}
-	}
-	
 	def onShowMenu(event: MouseEvent) {
 		menu.visible = true	
 	}
@@ -103,10 +77,73 @@ class Controller(
 		val dirChooser = new DirectoryChooser()
 		dirChooser.title = "Select photo directory"
 		
-		//fileChooser.setInitialDirectory(viewModel.getDefaultLogFileLocation())
+		dirChooser.initialDirectory = Configuration.directory.toFile
 
-		//fileChooser.showOpenDialog(primaryStage)
+		val selectedDir = dirChooser.showDialog(Main.stage)		
 		
+		if (selectedDir != null)
+		{
+			Configuration.directory = selectedDir.toPath			
+			loadImages
+		}
+				
+		menu.visible = false
 	}
+	
+	def loadImages() {
+		Configuration.loadImages match {
+			case Nil => {
+				noImagesFoundLabel.visible = true
+				imageView1.visible = false
+				imageView2.visible = false			
+			}
+			case urls => {
+				noImagesFoundLabel.visible = false
+				imageView1.visible = true
+				imageView2.visible = true
+				
+				images = urls 
+			
+				if (imageView1.image.value == null)
+				{
+					// load first image on startup
+					imageView1.image = getNextImage
+				}
+			
+			}
+		}
+	}	
+	
+	Platform.runLater({
+	
+		loadImages()
+		
+		val imageSwitchTimer = new Timer()
+		
+		imageSwitchTimer.schedule(new TimerTask 
+		{
+			def run = {
+				
+				if (!images.isEmpty) {
+					
+					if (currentImage % 2 == 0)
+					{
+						imageView1.image = getNextImage
+					}
+					else
+					{
+						imageView2.image = getNextImage
+					}
+				}
+			}							
+		}, 5000, 10000)
+		
+		timeline.play
+		
+		Main.stage.onCloseRequest = (event: WindowEvent) => {
+			imageSwitchTimer.cancel
+		}
+		
+	})
 	
 }
