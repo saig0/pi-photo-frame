@@ -12,6 +12,13 @@ import scalafx.animation.Timeline
 import scalafx.Includes._
 import scalafx.animation.Interpolator
 import scalafx.stage.Stage
+import java.nio.file.Paths
+import scalafx.event.ActionEvent
+import scalafx.scene.layout.VBox
+import scalafx.stage.FileChooser
+import scalafx.stage.FileChooser.ExtensionFilter
+import scalafx.stage.DirectoryChooser
+import scalafx.scene.input.MouseEvent
 
 /**
  * @author Philipp
@@ -20,13 +27,23 @@ import scalafx.stage.Stage
 class Controller(
 	private val imageView1: ImageView,
 	private val imageView2: ImageView,
-	private val noImagesFoundLabel: Label) {
-  
+	private val noImagesFoundLabel: Label,
+	private val menu: VBox) {
+
+	var images: List[String] = List()
 	var currentImage = 0
 	
+	private def getNextImage: Image = {
+		val img = images(currentImage % images.size)
+  	currentImage += 1		
+				
+		new Image(img)
+	}
+		
 	val timeline = new Timeline {
     cycleCount = Timeline.Indefinite
     autoReverse = false
+    
     keyFrames = Seq(
       at (0 s) {imageView1.opacity -> 1},
       at (0 s) {imageView2.opacity -> 0},
@@ -45,36 +62,51 @@ class Controller(
     )
 	}
 	
-	// TODO terminate thread on exit
-	
 	Configuration.getImagePaths match {
 		case Nil => noImagesFoundLabel.visible = true
-		case images => new Timer().schedule(new TimerTask 
-		{
-			def run = {
-				val img = images(currentImage % images.size)
+		case urls => {
+			images = urls 
+			
+			// TODO terminate thread on exit
+			new Timer().schedule(new TimerTask 
+			{
+				def run = {
 					
-				if (currentImage % 2 == 0)
-				{
-					imageView1.image.value = new Image(img)
-				}
-				else
-				{
-					imageView2.image.value = new Image(img)
-				}
-								
-				currentImage += 1
-			}		
-						
-		}, 5000, 10000)
+					if (currentImage % 2 == 0)
+					{
+						imageView1.image = getNextImage
+					}
+					else
+					{
+						imageView2.image = getNextImage
+					}
+				}							
+			}, 5000, 10000)
 		
-		// load first image
-		val img = images(currentImage % images.size)
-		imageView1.image.value = new Image(img)
+			// load first image
+			imageView1.image = getNextImage
 		
-		currentImage += 1
+			timeline.play
+		}
+	}
+	
+	def onShowMenu(event: MouseEvent) {
+		menu.visible = true	
+	}
+	
+	def onMenuClose(event: MouseEvent) {
+		menu.visible = false
+	}
+	
+	def onSelectPhotoDirectory(event: MouseEvent) {
+	
+		val dirChooser = new DirectoryChooser()
+		dirChooser.title = "Select photo directory"
 		
-		timeline.play
+		//fileChooser.setInitialDirectory(viewModel.getDefaultLogFileLocation())
+
+		//fileChooser.showOpenDialog(primaryStage)
+		
 	}
 	
 }
