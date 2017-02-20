@@ -43,9 +43,14 @@ class Controller(
 	private def showNextImage(view: ImageView) {
 		val path = images(currentImage % images.size)
   	currentImage += 1		
-				
-		val img = new Image(path.toUri.toURL.toExternalForm)
 		
+		val img = new Image(path.toUri.toURL.toExternalForm)
+		view.image = img
+
+		rotateImage(view, path)
+	}
+	
+	private def rotateImage(view: ImageView, path: Path) {
 		val metadata = ImageMetadataReader.readMetadata(path.toFile)
 		val directory = metadata.getFirstDirectoryOfType(classOf[ExifIFD0Directory])	
 		val orientation = directory.getInt(TAG_ORIENTATION)		
@@ -63,7 +68,15 @@ class Controller(
  					view.fitHeight = width
 				}
 			}				
-			case 3 => view.rotate = 180
+			case 3 => {
+				view.rotate = 180
+			
+				if (height > width)
+				{
+					view.fitWidth = height
+ 					view.fitHeight = width
+				}
+			}			
 			case 6 => {
 				view.rotate = 90
 				
@@ -73,10 +86,16 @@ class Controller(
  					view.fitHeight = width
 				}
 		 	}
-			case 8 => view.rotate = 270
+			case 8 => {
+				view.rotate = 270
+				
+				if (width > height)
+				{
+					view.fitWidth = height
+ 					view.fitHeight = width
+				}
+		 	}
 		}
-		
-		view.image = img
 	}
 		
 	val timeline = new Timeline {

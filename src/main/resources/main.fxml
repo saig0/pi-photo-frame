@@ -10,44 +10,44 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pi.photo.frame.view.Controller">
-  <children>
-      <Pane onMouseClicked="#onShowMenu" style="-fx-background-color: black;">
+
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pi.photo.frame.view.Controller">
+   <children>
+      <StackPane onMouseClicked="#onShowMenu" style="-fx-background-color: black;">
          <children>
             <ImageView fx:id="imageView1" fitHeight="1024.0" fitWidth="1280.0" onMouseClicked="#onShowMenu" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="imageView2" fitHeight="1024.0" fitWidth="1280.0" onMouseClicked="#onShowMenu" opacity="0.0" pickOnBounds="true" preserveRatio="true" />
-            <Label fx:id="noImagesFoundLabel" layoutX="522.0" layoutY="310.0" onMouseClicked="#onShowMenu" text="No photos found." textFill="#fcfafa" visible="false">
+            <Label fx:id="noImagesFoundLabel" onMouseClicked="#onShowMenu" text="No photos found." textFill="#fcfafa" visible="false">
                <font>
-                  <Font size="36.0" />
+                  <Font name="Open Sans" size="36.0" />
                </font>
             </Label>
-            <VBox fx:id="menu" layoutX="520.0" layoutY="336.0" prefHeight="141.0" prefWidth="286.0" spacing="10.0" style="-fx-background-color: white;" visible="false">
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-               <effect>
-                  <DropShadow />
-               </effect>
-               <children>
-                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Menu" textAlignment="CENTER">
-                     <font>
-                        <Font name="System Bold" size="24.0" />
-                     </font>
-                  </Label>
-                  <Button alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onSelectPhotoDirectory" text="Select photo directory" textAlignment="CENTER">
-                     <font>
-                        <Font size="24.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onMenuClose" text="Close" textAlignment="CENTER">
-                     <font>
-                        <Font size="24.0" />
-                     </font>
-                  </Button>
-               </children>
-            </VBox>
          </children>
-      </Pane>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS" />
-  </children>
-</VBox>
+      </StackPane>
+      <VBox fx:id="menu" layoutX="507.0" layoutY="202.0" prefHeight="172.0" prefWidth="319.0" spacing="10.0" style="-fx-background-color: white;">
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+         <effect>
+            <DropShadow />
+         </effect>
+         <children>
+            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Menu" textAlignment="CENTER">
+               <font>
+                  <Font name="Open Sans Bold" size="24.0" />
+               </font>
+            </Label>
+            <Button alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onSelectPhotoDirectory" text="Select photo directory" textAlignment="CENTER">
+               <font>
+                  <Font name="Open Sans" size="24.0" />
+               </font>
+            </Button>
+            <Button alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onMenuClose" text="Close" textAlignment="CENTER">
+               <font>
+                  <Font name="Open Sans" size="24.0" />
+               </font>
+            </Button>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
