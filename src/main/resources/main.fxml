@@ -24,7 +24,7 @@
             </Label>
          </children>
       </StackPane>
-      <VBox fx:id="menu" layoutX="507.0" layoutY="202.0" prefHeight="172.0" prefWidth="319.0" spacing="10.0" style="-fx-background-color: white;">
+      <VBox fx:id="menu" layoutX="507.0" layoutY="202.0" prefHeight="172.0" prefWidth="319.0" spacing="10.0" style="-fx-background-color: white;" visible="false">
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
