@@ -26,6 +26,7 @@ import java.io.File
 import com.drew.imaging.ImageMetadataReader
 import com.drew.metadata.exif.ExifDirectoryBase.TAG_ORIENTATION
 import com.drew.metadata.exif.ExifIFD0Directory
+import java.nio.file.Path
 
 @sfxml
 class Controller(
@@ -36,16 +37,16 @@ class Controller(
 
 	var config: Configuration = _
 	
-	var images: List[String] = List()
+	var images: List[Path] = List()
 	var currentImage = 0
 		
 	private def showNextImage(view: ImageView) {
 		val path = images(currentImage % images.size)
   	currentImage += 1		
 				
-		val img = new Image(path)
+		val img = new Image(path.toUri.toURL.toExternalForm)
 		
-		val metadata = ImageMetadataReader.readMetadata(new File(path.substring(6)))
+		val metadata = ImageMetadataReader.readMetadata(path.toFile)
 		val directory = metadata.getFirstDirectoryOfType(classOf[ExifIFD0Directory])	
 		val orientation = directory.getInt(TAG_ORIENTATION)		
 		
@@ -72,7 +73,7 @@ class Controller(
  					view.fitHeight = width
 				}
 		 	}
-			case 8 => view.rotate = -90
+			case 8 => view.rotate = 270
 		}
 		
 		view.image = img

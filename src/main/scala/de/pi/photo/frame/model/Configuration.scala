@@ -29,18 +29,17 @@ class Configuration(var directory: String) {
 	
 	def imageFilter = (path: Path) => {
  		val p = path.toString.toLowerCase
- 		
-		p.endsWith(".jpg")
+
+		p.endsWith(".jpg") || p.endsWith(".jpeg") || p.endsWith(".png") || p.endsWith(".gif") || p.endsWith(".bmp")
 	}
 
-	def loadImages: List[String] = {
+	def loadImages: List[Path] = {
 		
 		val dir = if (!directory.isEmpty) new File(directory) else Configuration.defaultPhotoDir 
 		
 		if (dir.exists){
 			val images = Files.walk(dir.toPath)
 				.filter(imageFilter)
-				.map[String]((p:Path) => p.toUri.toURL.toExternalForm)
 				.collect(Collectors.toList())
 				.toList
 			
