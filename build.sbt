@@ -12,7 +12,8 @@ libraryDependencies ++= List(
 	"org.scalafx" %% "scalafx" % "8.0.102-R11",
 	"org.scalafx" %% "scalafxml-core-sfx8" % "0.3",
 	"net.liftweb" %% "lift-json" % "2.6.2",
-	"net.liftweb" %% "lift-json-ext" % "2.6.2"
+	"net.liftweb" %% "lift-json-ext" % "2.6.2",
+	"com.drewnoakes" % "metadata-extractor" % "2.10.1"
 )
  
 libraryDependencies ++= List(

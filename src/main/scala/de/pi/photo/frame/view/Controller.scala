@@ -2,7 +2,7 @@ package de.pi.photo.frame.view
 
 import scalafxml.core.macros.sfxml
 import scalafx.scene.image.ImageView
-import javafx.scene.image.Image
+import scalafx.scene.image.Image
 import scalafx.beans.property.ObjectProperty.sfxObjectProperty2jfx
 import de.pi.photo.frame.model.Configuration
 import scalafx.scene.control.Label
@@ -23,6 +23,9 @@ import scalafx.stage.WindowEvent
 import scalafx.application.Platform
 import de.pi.photo.frame.model.Configuration
 import java.io.File
+import com.drew.imaging.ImageMetadataReader
+import com.drew.metadata.exif.ExifDirectoryBase.TAG_ORIENTATION
+import com.drew.metadata.exif.ExifIFD0Directory
 
 @sfxml
 class Controller(
@@ -35,12 +38,44 @@ class Controller(
 	
 	var images: List[String] = List()
 	var currentImage = 0
-	
-	private def getNextImage: Image = {
-		val img = images(currentImage % images.size)
+		
+	private def showNextImage(view: ImageView) {
+		val path = images(currentImage % images.size)
   	currentImage += 1		
 				
-		new Image(img)
+		val img = new Image(path)
+		
+		val metadata = ImageMetadataReader.readMetadata(new File(path.substring(6)))
+		val directory = metadata.getFirstDirectoryOfType(classOf[ExifIFD0Directory])	
+		val orientation = directory.getInt(TAG_ORIENTATION)		
+		
+		val width = view.fitWidth.get
+		val height = view.fitHeight.get
+		
+		orientation match {
+			case 1 => {
+				view.rotate = 0
+			
+				if (height > width)
+				{
+					view.fitWidth = height
+ 					view.fitHeight = width
+				}
+			}				
+			case 3 => view.rotate = 180
+			case 6 => {
+				view.rotate = 90
+				
+				if (width > height)
+				{
+					view.fitWidth = height
+ 					view.fitHeight = width
+				}
+		 	}
+			case 8 => view.rotate = -90
+		}
+		
+		view.image = img
 	}
 		
 	val timeline = new Timeline {
@@ -115,7 +150,7 @@ class Controller(
 				if (imageView1.image.value == null)
 				{
 					// load first image on startup
-					imageView1.image = getNextImage
+					showNextImage(imageView1)
 				}
 			
 			}
@@ -138,12 +173,13 @@ class Controller(
 					
 					if (currentImage % 2 == 0)
 					{
-						imageView1.image = getNextImage
+						showNextImage(imageView1)
 					}
 					else
 					{
-						imageView2.image = getNextImage
+						showNextImage(imageView2)
 					}
+					
 				}
 			}							
 		}, 5000, 10000)
