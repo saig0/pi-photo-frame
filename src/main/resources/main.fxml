@@ -55,5 +55,19 @@
             </Button>
          </children>
       </VBox>
+      <StackPane fx:id="progressPane" layoutX="1070.0" layoutY="984.0" opacity="0.9" prefHeight="35.0" prefWidth="206.0">
+         <children>
+            <ProgressBar fx:id="progressBar" prefHeight="21.0" prefWidth="235.0" style="-fx-accent: lightskyblue;">
+               <effect>
+                  <DropShadow />
+               </effect>
+            </ProgressBar>
+            <Label alignment="CENTER" prefHeight="20.0" prefWidth="233.0" text="Loading...">
+               <font>
+                  <Font name="Open Sans" size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </StackPane>
    </children>
 </AnchorPane>

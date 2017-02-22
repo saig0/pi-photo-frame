@@ -23,6 +23,9 @@ object Main extends JFXApp {
             new DependenciesByType(Map()))
     )
     
+    width = 1280
+    height = 1024
+    
     maximized = true    
 		fullScreen = true   
   }

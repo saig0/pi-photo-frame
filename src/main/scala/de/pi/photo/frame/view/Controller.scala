@@ -27,13 +27,17 @@ import com.drew.imaging.ImageMetadataReader
 import com.drew.metadata.exif.ExifDirectoryBase.TAG_ORIENTATION
 import com.drew.metadata.exif.ExifIFD0Directory
 import java.nio.file.Path
+import scalafx.scene.layout.StackPane
+import scalafx.scene.control.ProgressBar
 
 @sfxml
 class Controller(
 	private val imageView1: ImageView,
 	private val imageView2: ImageView,
 	private val noImagesFoundLabel: Label,
-	private val menu: VBox) {
+	private val menu: VBox,
+	private val progressPane: StackPane,
+	private val progressBar: ProgressBar) {
 	
 	var config: Configuration = _
 	
@@ -154,31 +158,41 @@ class Controller(
 	}
 	
 	def loadImages() {
-		config.loadImages match {
-			case Nil => {
-				noImagesFoundLabel.visible = true
-				imageView1.visible = false
-				imageView2.visible = false			
-			}
-			case urls => {
-				noImagesFoundLabel.visible = false
-				imageView1.visible = true
-				imageView2.visible = true
-				
-				images = urls 
+		
+		progressPane.visible = true
+		
+		Platform.runLater {
 			
-				if (imageView1.image.value == null)
-				{
-					// load first image on startup
-					showNextImage(imageView1)
+			config.loadImages match {
+				case Nil => {
+					noImagesFoundLabel.visible = true
+					imageView1.visible = false
+					imageView2.visible = false			
 				}
-			
+				case urls => {
+					noImagesFoundLabel.visible = false
+					imageView1.visible = true
+					imageView2.visible = true
+					
+					images = urls 
+				
+					if (imageView1.image.value == null)
+					{
+						// load first image on startup
+						showNextImage(imageView1)
+					}
+				
+				}
 			}
+			
+			progressPane.visible = false
+			
 		}
+		
 	}	
 	
-	Platform.runLater({
-	
+	Platform.runLater {
+		
 		// maximize image views
 		imageView1.fitWidth <= Main.stage.width
 		imageView1.fitHeight <= Main.stage.height
@@ -216,6 +230,6 @@ class Controller(
 			imageSwitchTimer.cancel
 		}
 		
-	})
+	}
 	
 }
