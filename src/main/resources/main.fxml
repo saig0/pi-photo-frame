@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.image.*?>
@@ -10,21 +11,26 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-
-<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pi.photo.frame.view.Controller">
+<AnchorPane style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pi.photo.frame.view.Controller">
    <children>
       <StackPane onMouseClicked="#onShowMenu" style="-fx-background-color: black;">
          <children>
-            <ImageView fx:id="imageView1" fitHeight="1024.0" fitWidth="1280.0" onMouseClicked="#onShowMenu" pickOnBounds="true" preserveRatio="true" />
-            <ImageView fx:id="imageView2" fitHeight="1024.0" fitWidth="1280.0" onMouseClicked="#onShowMenu" opacity="0.0" pickOnBounds="true" preserveRatio="true" />
-            <Label fx:id="noImagesFoundLabel" onMouseClicked="#onShowMenu" text="No photos found." textFill="#fcfafa" visible="false">
+            <ImageView fx:id="imageView1" fitHeight="1024.0" fitWidth="1280.0" onMouseClicked="#onShowMenu" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></ImageView>
+            <ImageView fx:id="imageView2" fitHeight="1024.0" fitWidth="1280.0" onMouseClicked="#onShowMenu" opacity="0.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></ImageView>
+            <Label fx:id="noImagesFoundLabel" onMouseClicked="#onShowMenu" prefHeight="94.0" prefWidth="303.0" text="No images found." textFill="#fcfafa" visible="false">
                <font>
                   <Font name="Open Sans" size="36.0" />
                </font>
             </Label>
          </children>
       </StackPane>
-      <VBox fx:id="menu" layoutX="507.0" layoutY="202.0" prefHeight="172.0" prefWidth="319.0" spacing="10.0" style="-fx-background-color: white;" visible="false">
+      <VBox fx:id="menu" layoutX="507.0" layoutY="310.0" prefHeight="171.0" prefWidth="319.0" spacing="10.0" style="-fx-background-color: white;" visible="false">
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
@@ -37,12 +43,12 @@
                   <Font name="Open Sans Bold" size="24.0" />
                </font>
             </Label>
-            <Button alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onSelectPhotoDirectory" text="Select photo directory" textAlignment="CENTER">
+            <Button alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onSelectPhotoDirectory" text="select image directory" textAlignment="CENTER">
                <font>
                   <Font name="Open Sans" size="24.0" />
                </font>
             </Button>
-            <Button alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onMenuClose" text="Close" textAlignment="CENTER">
+            <Button alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onMenuClose" text="close menu" textAlignment="CENTER">
                <font>
                   <Font name="Open Sans" size="24.0" />
                </font>

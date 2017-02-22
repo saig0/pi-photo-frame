@@ -24,7 +24,7 @@ object Main extends JFXApp {
     )
     
     maximized = true    
-		fullScreen = true // doesn't work somehow    
+		fullScreen = true   
   }
 	
 }

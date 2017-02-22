@@ -34,7 +34,7 @@ class Controller(
 	private val imageView2: ImageView,
 	private val noImagesFoundLabel: Label,
 	private val menu: VBox) {
-
+	
 	var config: Configuration = _
 	
 	var images: List[Path] = List()
@@ -179,6 +179,12 @@ class Controller(
 	
 	Platform.runLater({
 	
+		// maximize image views
+		imageView1.fitWidth <= Main.stage.width
+		imageView1.fitHeight <= Main.stage.height
+		imageView2.fitWidth <= Main.stage.width
+		imageView2.fitHeight <= Main.stage.height
+		
 		config = Configuration.load
 		
 		loadImages()
