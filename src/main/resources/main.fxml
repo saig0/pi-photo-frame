@@ -11,25 +11,32 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
+
 <AnchorPane style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pi.photo.frame.view.Controller">
    <children>
-      <StackPane onMouseClicked="#onShowMenu" style="-fx-background-color: black;">
+      <StackPane fx:id="imageViewPane1" prefHeight="1024.0" prefWidth="1280.0">
          <children>
-            <ImageView fx:id="imageView1" fitHeight="1024.0" fitWidth="1280.0" onMouseClicked="#onShowMenu" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+            <ImageView fx:id="imageView1" fitHeight="1024.0" fitWidth="1280.0" onMouseClicked="#onShowMenu" pickOnBounds="true" preserveRatio="true">
                <cursor>
                   <Cursor fx:constant="HAND" />
-               </cursor></ImageView>
-            <ImageView fx:id="imageView2" fitHeight="1024.0" fitWidth="1280.0" onMouseClicked="#onShowMenu" opacity="0.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor></ImageView>
-            <Label fx:id="noImagesFoundLabel" onMouseClicked="#onShowMenu" prefHeight="94.0" prefWidth="303.0" text="No images found." textFill="#fcfafa" visible="false">
-               <font>
-                  <Font name="Open Sans" size="36.0" />
-               </font>
-            </Label>
+               </cursor>
+            </ImageView>
          </children>
       </StackPane>
+      <StackPane fx:id="imageViewPane2" prefHeight="1024.0" prefWidth="1280.0">
+         <children>
+            <ImageView fx:id="imageView2" fitHeight="1024.0" fitWidth="1280.0" onMouseClicked="#onShowMenu" opacity="0.0" pickOnBounds="true" preserveRatio="true">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ImageView>
+         </children>
+      </StackPane>
+      <Label fx:id="noImagesFoundLabel" onMouseClicked="#onShowMenu" prefHeight="94.0" prefWidth="303.0" text="No images found." textFill="#fcfafa" visible="false">
+         <font>
+            <Font name="Open Sans" size="36.0" />
+         </font>
+      </Label>
       <VBox fx:id="menu" layoutX="507.0" layoutY="310.0" prefHeight="171.0" prefWidth="319.0" spacing="10.0" style="-fx-background-color: white;" visible="false">
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

@@ -37,7 +37,8 @@ class Controller(
 	private val noImagesFoundLabel: Label,
 	private val menu: VBox,
 	private val progressPane: StackPane,
-	private val progressBar: ProgressBar) {
+	private val imageViewPane1: StackPane,
+	private val imageViewPane2: StackPane) {
 	
 	var config: Configuration = _
 	
@@ -100,22 +101,25 @@ class Controller(
 				}
 			}
 			
-			progressPane.visible = false
-			
+			progressPane.visible = false			
 		}
-		
 	}	
 	
 	private def reset {
 		
-		currentImage = 0
+		if (imageSwitchTask != null)
+		{
+			imageSwitchTask.cancel
+		}
 		
 		imageView2.image = null
 		
 		imageView2.opacity = 1
 		imageView1.opacity = 0
 		
-	  showNextImage(imageView1)
+		currentImage = 0
+		
+		showNextImage(imageView1)
 	}
 	
 	private def showNextImage(view: ImageView) {
@@ -131,13 +135,13 @@ class Controller(
 		
 		if (currentImage % 2 == 0)
 		{
-			imageSwitchTimer.schedule(new ImageViewSwitchTask(imageView1), 10000)
+			scheduleNextImage(imageView1)
 			
 			timelineToView2.play				
 		}
 		else 
 		{
-			imageSwitchTimer.schedule(new ImageViewSwitchTask(imageView2), 10000)
+			scheduleNextImage(imageView2)
 			
 			timelineToView1.play
 		}
@@ -189,20 +193,6 @@ class Controller(
 				}
 		 	}
 		}
-		
-//		imageView1.layoutX = 0
-//		imageView1.layoutY = 0
-//		imageView1.x = 0
-//		imageView1.y = 0
-//		imageView1.translateX = 0
-//		imageView1.translateY = 0
-//		
-//		imageView2.layoutX = 0
-//		imageView2.layoutY = 0
-//		imageView2.x = 0
-//		imageView2.y = 0
-//		imageView2.translateX = 0
-//		imageView2.translateY = 0
 	}
 		
 	val timelineToView2 = new Timeline {
@@ -229,7 +219,13 @@ class Controller(
     )
 	}
 	
+	private def scheduleNextImage(view: ImageView) {
+		imageSwitchTask = new ImageViewSwitchTask(view)
+		imageSwitchTimer.schedule(imageSwitchTask, 10000)
+	}
+	
   val imageSwitchTimer = new Timer()
+  var imageSwitchTask: ImageViewSwitchTask = _
 		
   class ImageViewSwitchTask(view: ImageView) extends TimerTask 
   {
@@ -246,6 +242,13 @@ class Controller(
 		imageView2.fitWidth <= Main.stage.width
 		imageView2.fitHeight <= Main.stage.height
 		
+		imageViewPane1.prefWidth <= Main.stage.width
+		imageViewPane1.prefHeight <= Main.stage.height
+		
+		imageViewPane2.prefWidth <= Main.stage.width
+		imageViewPane2.prefHeight <= Main.stage.height
+		
+		// load images
 		config = Configuration.load
 		
 		loadImages()
