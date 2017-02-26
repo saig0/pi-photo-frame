@@ -38,6 +38,7 @@ class Configuration(var directory: String) {
 		val dir = if (!directory.isEmpty) new File(directory) else Configuration.defaultPhotoDir 
 		
 		if (dir.exists){
+			// TODO deal with errors
 			val images = Files.walk(dir.toPath)
 				.filter(imageFilter)
 				.collect(Collectors.toList())

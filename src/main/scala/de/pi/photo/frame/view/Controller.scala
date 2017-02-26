@@ -107,6 +107,7 @@ class Controller(
 	
 	private def reset {
 		
+		// TODO ensure that the current cycle ends
 		if (imageSwitchTask != null)
 		{
 			imageSwitchTask.cancel
