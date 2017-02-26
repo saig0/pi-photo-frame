@@ -44,86 +44,6 @@ class Controller(
 	var images: List[Path] = List()
 	var currentImage = 0
 		
-	private def showNextImage(view: ImageView) {
-		val path = images(currentImage % images.size)
-  	currentImage += 1		
-		
-		val img = new Image(path.toUri.toURL.toExternalForm)
-		view.image = img
-
-		rotateImage(view, path)
-	}
-	
-	private def rotateImage(view: ImageView, path: Path) {
-		val metadata = ImageMetadataReader.readMetadata(path.toFile)
-		val directory = metadata.getFirstDirectoryOfType(classOf[ExifIFD0Directory])	
-		val orientation = directory.getInt(TAG_ORIENTATION)		
-		
-		val width = view.fitWidth.get
-		val height = view.fitHeight.get
-		
-		orientation match {
-			case 1 => {
-				view.rotate = 0
-			
-				if (height > width)
-				{
-					view.fitWidth = height
- 					view.fitHeight = width
-				}
-			}				
-			case 3 => {
-				view.rotate = 180
-			
-				if (height > width)
-				{
-					view.fitWidth = height
- 					view.fitHeight = width
-				}
-			}			
-			case 6 => {
-				view.rotate = 90
-				
-				if (width > height)
-				{
-					view.fitWidth = height
- 					view.fitHeight = width
-				}
-		 	}
-			case 8 => {
-				view.rotate = 270
-				
-				if (width > height)
-				{
-					view.fitWidth = height
- 					view.fitHeight = width
-				}
-		 	}
-		}
-	}
-		
-	val timeline = new Timeline {
-    cycleCount = Timeline.Indefinite
-    autoReverse = false
-    
-    keyFrames = Seq(
-      at (0 s) {imageView1.opacity -> 1},
-      at (0 s) {imageView2.opacity -> 0},
-      at (8 s) {imageView1.opacity -> 1},
-      at (8 s) {imageView2.opacity -> 0},
-      at (9 s) {imageView1.opacity -> 0.5},
-      at (9 s) {imageView2.opacity -> 0.5},
-      at (10 s) {imageView1.opacity -> 0},
-      at (10 s) {imageView2.opacity -> 1},
-      at (18 s) {imageView1.opacity -> 0},
-      at (18 s) {imageView2.opacity -> 1},
-      at (19 s) {imageView1.opacity -> 0.5},
-      at (19 s) {imageView2.opacity -> 0.5},
-      at (20 s) {imageView1.opacity -> 1},
-      at (20 s) {imageView2.opacity -> 0}
-    )
-	}
-	
 	def onShowMenu(event: MouseEvent) {
 		menu.visible = true	
 	}
@@ -176,12 +96,7 @@ class Controller(
 					
 					images = urls 
 				
-					if (imageView1.image.value == null)
-					{
-						// load first image on startup
-						showNextImage(imageView1)
-					}
-				
+					reset
 				}
 			}
 			
@@ -190,6 +105,138 @@ class Controller(
 		}
 		
 	}	
+	
+	private def reset {
+		
+		currentImage = 0
+		
+		imageView2.image = null
+		
+		imageView2.opacity = 1
+		imageView1.opacity = 0
+		
+	  showNextImage(imageView1)
+	}
+	
+	private def showNextImage(view: ImageView) {
+		val path = images(currentImage % images.size)
+  	currentImage += 1		
+		
+		val img = new Image(path.toUri.toURL.toExternalForm)
+		view.image = img
+
+		rotateImage(view, path)
+		
+		// schedule next image
+		
+		if (currentImage % 2 == 0)
+		{
+			imageSwitchTimer.schedule(new ImageViewSwitchTask(imageView1), 10000)
+			
+			timelineToView2.play				
+		}
+		else 
+		{
+			imageSwitchTimer.schedule(new ImageViewSwitchTask(imageView2), 10000)
+			
+			timelineToView1.play
+		}
+	}
+	
+	private def rotateImage(view: ImageView, path: Path) {
+		val metadata = ImageMetadataReader.readMetadata(path.toFile)
+		val directory = metadata.getFirstDirectoryOfType(classOf[ExifIFD0Directory])	
+		val orientation = directory.getInt(TAG_ORIENTATION)		
+		
+		val width = view.fitWidth.get
+		val height = view.fitHeight.get
+		
+		orientation match {
+			case 1 => {
+				view.rotate = 0
+			
+				if (height > width)
+				{
+					view.fitWidth = height
+ 					view.fitHeight = width
+				}
+			}				
+			case 3 => {
+				view.rotate = 180
+			
+				if (height > width)
+				{
+					view.fitWidth = height
+ 					view.fitHeight = width
+				}
+			}			
+			case 6 => {
+				view.rotate = 90
+				
+				if (width > height)
+				{
+					view.fitWidth = height
+ 					view.fitHeight = width
+				}
+		 	}
+			case 8 => {
+				view.rotate = 270
+				
+				if (width > height)
+				{
+					view.fitWidth = height
+ 					view.fitHeight = width
+				}
+		 	}
+		}
+		
+//		imageView1.layoutX = 0
+//		imageView1.layoutY = 0
+//		imageView1.x = 0
+//		imageView1.y = 0
+//		imageView1.translateX = 0
+//		imageView1.translateY = 0
+//		
+//		imageView2.layoutX = 0
+//		imageView2.layoutY = 0
+//		imageView2.x = 0
+//		imageView2.y = 0
+//		imageView2.translateX = 0
+//		imageView2.translateY = 0
+	}
+		
+	val timelineToView2 = new Timeline {
+    
+    keyFrames = Seq(
+      at (0 s) {imageView1.opacity -> 1},
+      at (0 s) {imageView2.opacity -> 0},
+      at (1 s) {imageView1.opacity -> 0.5},
+      at (1 s) {imageView2.opacity -> 0.5},
+      at (2 s) {imageView1.opacity -> 0},
+      at (2 s) {imageView2.opacity -> 1}
+    )
+	}
+	
+	val timelineToView1 = new Timeline {
+    
+    keyFrames = Seq(
+      at (0 s) {imageView1.opacity -> 0},
+      at (0 s) {imageView2.opacity -> 1},
+      at (1 s) {imageView1.opacity -> 0.5},
+      at (1 s) {imageView2.opacity -> 0.5},
+      at (2 s) {imageView1.opacity -> 1},
+      at (2 s) {imageView2.opacity -> 0}
+    )
+	}
+	
+  val imageSwitchTimer = new Timer()
+		
+  class ImageViewSwitchTask(view: ImageView) extends TimerTask 
+  {
+  	def run {
+  		showNextImage(view)
+  	}
+  }
 	
 	Platform.runLater {
 		
@@ -202,30 +249,7 @@ class Controller(
 		config = Configuration.load
 		
 		loadImages()
-		
-		val imageSwitchTimer = new Timer()
-		
-		imageSwitchTimer.schedule(new TimerTask 
-		{
-			def run = {
 				
-				if (!images.isEmpty) {
-					
-					if (currentImage % 2 == 0)
-					{
-						showNextImage(imageView1)
-					}
-					else
-					{
-						showNextImage(imageView2)
-					}
-					
-				}
-			}							
-		}, 5000, 10000)
-		
-		timeline.play
-		
 		Main.stage.onCloseRequest = (event: WindowEvent) => {
 			imageSwitchTimer.cancel
 		}
