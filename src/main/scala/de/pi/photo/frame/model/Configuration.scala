@@ -11,8 +11,12 @@ import java.io.FileOutputStream
 import java.io.FileInputStream
 import java.nio.charset.StandardCharsets
 import scala.util.Random
-import java.nio.file.FileVisitOption
+import java.nio.file.FileVisitor
 import java.util.stream.Collectors
+import java.nio.file.attribute.BasicFileAttributes
+import java.nio.file.FileVisitResult
+import java.io.IOException
+import java.io.IOException
 
 /**
  * @author Philipp
@@ -26,25 +30,46 @@ class Configuration(var directory: String) {
 	implicit def toJavaFunction[A, B](f: Function1[A, B]) = new java.util.function.Function[A, B] {
 	  override def apply(a: A): B = f(a)
 	}
-	
-	def imageFilter = (path: Path) => {
+		
+	private def isImage = (path: Path) => {
  		val p = path.toString.toLowerCase
 
-		p.endsWith(".jpg") || p.endsWith(".jpeg") || p.endsWith(".png") || p.endsWith(".gif") || p.endsWith(".bmp")
+		(			 p.endsWith(".jpg") 
+				|| p.endsWith(".jpeg") 
+				|| p.endsWith(".png") 
+				|| p.endsWith(".gif") 
+				|| p.endsWith(".bmp"))
 	}
 
 	def loadImages: List[Path] = {
 		
 		val dir = if (!directory.isEmpty) new File(directory) else Configuration.defaultPhotoDir 
 		
-		if (dir.exists){
-			// TODO deal with errors
-			val images = Files.walk(dir.toPath)
-				.filter(imageFilter)
-				.collect(Collectors.toList())
-				.toList
+		if (dir.exists)
+		{
+			val imageBufferList = List[Path]().toBuffer
 			
-			Random.shuffle(images)
+			Files.walkFileTree(dir.toPath, new FileVisitor[Path] {
+				
+				def preVisitDirectory(directory: Path, attr: BasicFileAttributes) = FileVisitResult.CONTINUE
+				
+				def postVisitDirectory(directory: Path, e: IOException) = FileVisitResult.CONTINUE
+				
+				def visitFile(file: Path, attr: BasicFileAttributes) = {
+					
+					if (isImage(file)) {
+						imageBufferList += file		
+					}
+					
+					FileVisitResult.CONTINUE
+				}
+				
+				def visitFileFailed(file: Path, e: IOException) = FileVisitResult.CONTINUE
+				
+			})
+						
+			Random.shuffle(imageBufferList.toList)
+			
 		} else {
 			List()
 		}
@@ -67,17 +92,31 @@ object Configuration {
 	
 	lazy val defaultPhotoDir = new File(userDirectory, "photo")
 	
+	private def defaultConfig = new Configuration(defaultPhotoDir.getAbsolutePath)
+	
 	def load: Configuration = {		
-		if (configLocation.exists)
-		{
-			val bytes = Files.readAllBytes(configLocation.toPath)
-			val json = new String(bytes, StandardCharsets.UTF_8)
-			
-			parse(json).extract[Configuration]			
-		}
-		else 
-		{
-			new Configuration(defaultPhotoDir.getAbsolutePath)	
+		
+		try 
+		{		
+			if (configLocation.exists) 
+			{		
+					val bytes = Files.readAllBytes(configLocation.toPath)
+					val json = new String(bytes, StandardCharsets.UTF_8)
+					
+					parse(json).extract[Configuration]							
+			}
+			else 
+			{
+				defaultConfig
+			}		
+		
+		} catch {
+				case t: Throwable => {
+					System.err.println("Failed to load configuration: " + configLocation)
+					t.printStackTrace
+					
+					defaultConfig	
+				}
 		}		
 	}
 
@@ -89,11 +128,11 @@ object Configuration {
 		try 
 		{
 			Files.write(configLocation.toPath, bytes)
-		}
-		catch {
+		
+		} catch {
 			case t: Throwable => {
 				System.err.println("Failed to save configuration")	
-				t.printStackTrace()
+				t.printStackTrace
 			}
 		}
 	}

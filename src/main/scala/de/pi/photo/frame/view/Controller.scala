@@ -29,6 +29,8 @@ import com.drew.metadata.exif.ExifIFD0Directory
 import java.nio.file.Path
 import scalafx.scene.layout.StackPane
 import scalafx.scene.control.ProgressBar
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicBoolean
 
 @sfxml
 class Controller(
@@ -56,7 +58,7 @@ class Controller(
 	def onSelectPhotoDirectory(event: MouseEvent) {
 	
 		val dirChooser = new DirectoryChooser()
-		dirChooser.title = "Select photo directory"
+		dirChooser.title = "select image directory"
 		
 		val dir = new File(config.directory)
 		
@@ -107,11 +109,14 @@ class Controller(
 	
 	private def reset {
 		
-		// TODO ensure that the current cycle ends
 		if (imageSwitchTask != null)
 		{
+			imageSwitchTask.waitUntilEnd
 			imageSwitchTask.cancel
 		}
+		
+		timelineToView1.stop
+		timelineToView2.stop
 		
 		imageView2.image = null
 		
@@ -127,25 +132,31 @@ class Controller(
 		val path = images(currentImage % images.size)
   	currentImage += 1		
 		
-		val img = new Image(path.toUri.toURL.toExternalForm)
-		view.image = img
-
-		rotateImage(view, path)
-		
-		// schedule next image
-		
-		if (currentImage % 2 == 0)
-		{
-			scheduleNextImage(imageView1)
+  	try {
+  	
+			val img = new Image(path.toUri.toURL.toExternalForm)
+			view.image = img
+	
+			rotateImage(view, path)
 			
-			timelineToView2.play				
-		}
-		else 
-		{
-			scheduleNextImage(imageView2)
+			// schedule next image
 			
-			timelineToView1.play
-		}
+			if (currentImage % 2 == 0) 
+			{
+				scheduleNextImage(imageView1)
+				
+				timelineToView2.play				
+			} 
+			else 
+			{
+				scheduleNextImage(imageView2)
+				
+				timelineToView1.play
+			}
+  		
+  	} catch {
+  			case _: Throwable => showNextImage(view)
+  	}
 	}
 	
 	private def rotateImage(view: ImageView, path: Path) {
@@ -222,16 +233,29 @@ class Controller(
 	
 	private def scheduleNextImage(view: ImageView) {
 		imageSwitchTask = new ImageViewSwitchTask(view)
-		imageSwitchTimer.schedule(imageSwitchTask, 10000)
+		imageSwitchTimer.schedule(imageSwitchTask, 10000)	
 	}
 	
   val imageSwitchTimer = new Timer()
   var imageSwitchTask: ImageViewSwitchTask = _
-		
+  
   class ImageViewSwitchTask(view: ImageView) extends TimerTask 
   {
+  	var isRunning = false
+  	
   	def run {
-  		showNextImage(view)
+  		isRunning = true  			
+  		
+  		showNextImage(view) 
+  		
+  		isRunning = false
+  	}
+  	
+  	def waitUntilEnd {  		
+  		while(isRunning)
+  		{
+  			Thread.sleep(100)
+  		}  		
   	}
   }
 	
